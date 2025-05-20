@@ -59,7 +59,6 @@ response = client.chat.completions.create(
 )
 
 resultat = response.choices[0].message.content
-
-        st.subheader("📌 Résultat de l'analyse")
-        st.markdown(resultat)
+st.subheader("📌 Résultat de l'analyse")
+st.markdown(resultat)
 
