@@ -48,8 +48,7 @@ Analyse l'appel à projet et :
 2. Évalue si l'association semble éligible.
 3. Propose un plan de réponse en 3 à 5 points.
         """
-
-       import openai
+import openai
 from openai import OpenAI
 
 client = OpenAI(api_key=openai_api_key)
