@@ -1,7 +1,7 @@
 import streamlit as st
 import fitz  # PyMuPDF
-import openai
 import json
+from openai import OpenAI
 
 st.set_page_config(page_title="Agent IA - Appel à projet", layout="centered")
 
@@ -49,29 +49,17 @@ Analyse l'appel à projet et :
 3. Propose un plan de réponse en 3 à 5 points.
         """
 
-        from openai import OpenAI
-        client = OpenAI(api_key=openai_api_key)
+        try:
+            client = OpenAI(api_key=openai_api_key)
 
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
-        )
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}]
+            )
 
-        resultat = response.choices[0].message.content
-        st.subheader("📌 Résultat de l'analyse")
-        st.markdown(resultat)
+            resultat = response.choices[0].message.content
+            st.subheader("📌 Résultat de l'analyse")
+            st.markdown(resultat)
 
-import openai
-from openai import OpenAI
-
-client = OpenAI(api_key=openai_api_key)
-
-response = client.chat.completions.create(
-    model="gpt-4",
-    messages=[{"role": "user", "content": prompt}]
-)
-
-resultat = response.choices[0].message.content
-st.subheader("📌 Résultat de l'analyse")
-st.markdown(resultat)
-
+        except Exception as e:
+            st.error(f"Erreur lors de l'appel à l'API OpenAI : {str(e)}")
