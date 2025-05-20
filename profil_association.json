@@ -1,0 +1,37 @@
+{
+  "nom": "Association Sportive de Pierrefitte",
+  "mission": "Promouvoir la pratique du sport pour tous",
+  "activités": [
+    "Athlétisme",
+    "Badminton",
+    "Basket",
+    "Boxe Anglaise",
+    "Judo",
+    "Multisports feminins",
+    "Natation",
+    "Multi-activité +50ans",
+    "Sport de contact",
+    "Tennis de table",
+    "Multisports",
+    "Action Sport Santé"
+  ],
+  "public": "Jeunes de 8 à 18 ans en quartier prioritaire et population des quartiers prioritaire",
+  "réalisations": [
+    "Tournoi interquartiers 2023",
+    "Projet santé et sport 2022"
+  ],
+  "partenaires": [
+    "Mairie",
+    "Auto-école",
+    "ARS"
+  ],
+  "ressources_disponibles": {
+    "encadrants": 5,
+    "bénévoles": 12,
+    "lieux": ["Palais des sports", "Complexe Sportif"]
+  },
+  "coordonnées": {
+    "adresse": "19 rue du Paris, 93380 Saint-Denis",
+    "contact": "asp.omnisports@gmail.com"
+  }
+}
