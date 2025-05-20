@@ -48,6 +48,19 @@ Analyse l'appel à projet et :
 2. Évalue si l'association semble éligible.
 3. Propose un plan de réponse en 3 à 5 points.
         """
+
+        from openai import OpenAI
+        client = OpenAI(api_key=openai_api_key)
+
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        resultat = response.choices[0].message.content
+        st.subheader("📌 Résultat de l'analyse")
+        st.markdown(resultat)
+
 import openai
 from openai import OpenAI
 
