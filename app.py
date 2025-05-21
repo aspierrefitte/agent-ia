@@ -71,12 +71,6 @@ def extraire_reponse(text):
 
 # Traitement principal
 if uploaded_file and hf_token :
-    try:
-        profil = json.load(profil_file)
-    except Exception as e:
-        st.error(f"❌ Erreur lors de la lecture du fichier JSON : {e}")
-        st.stop()
-
     texte_pdf = lire_pdf(uploaded_file)
 
     prompt = f"""
