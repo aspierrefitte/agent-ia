@@ -92,9 +92,6 @@ if uploaded_file and hf_token:
 
     Rédige de façon professionnelle, claire et concise.
 """
-
-
-
 resultat = interroger_modele_hf(prompt, hf_token)
 st.subheader("📌 Résultat de l'analyse")
 st.markdown(resultat)
