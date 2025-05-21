@@ -70,7 +70,7 @@ def extraire_reponse(text):
     return text
 
 # Traitement principal
-if uploaded_file and hf_token and profil_file:
+if uploaded_file and hf_token :
     try:
         profil = json.load(profil_file)
     except Exception as e:
