@@ -95,6 +95,6 @@ if uploaded_file and hf_token:
 
 
 
-        resultat = interroger_modele_hf(prompt, hf_token)
-        st.subheader("📌 Résultat de l'analyse")
-        st.markdown(resultat)
+resultat = interroger_modele_hf(prompt, hf_token)
+st.subheader("📌 Résultat de l'analyse")
+st.markdown(resultat)
