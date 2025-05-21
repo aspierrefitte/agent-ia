@@ -1,24 +1,24 @@
 import streamlit as st
 import fitz  # PyMuPDF
 import json
-from openai import OpenAI
+import requests
 
 st.set_page_config(page_title="Agent IA - Appel à projet", layout="centered")
 
-st.title("📄 Agent IA - Analyse d'un appel à projet")
+st.title("📄 Agent IA - Analyse d'un appel à projet (version gratuite)")
 
 # Chargement du profil associatif
 try:
     with open("profil_association.json", "r", encoding="utf-8") as f:
         profil = json.load(f)
 except FileNotFoundError:
-    st.error("Fichier 'profil_association.json' manquant. Ajoutez-le au dépôt GitHub.")
+    st.error("Fichier 'profil_association.json' manquant.")
     st.stop()
 
-# Entrée de la clé OpenAI
-openai_api_key = st.text_input("🔑 Clé API OpenAI (ne sera pas stockée)", type="password")
+# Entrée du token Hugging Face
+hf_token = st.text_input("🔑 Token Hugging Face (ne sera pas stocké)", type="password")
 
-# Téléversement du fichier PDF
+# Téléversement du PDF
 uploaded_file = st.file_uploader("📎 Téléverser un appel à projet (PDF)", type="pdf")
 
 def lire_pdf(file):
@@ -28,12 +28,28 @@ def lire_pdf(file):
         texte += page.get_text()
     return texte
 
-if uploaded_file and openai_api_key:
+def interroger_modele_hf(prompt, token):
+    API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+    headers = {"Authorization": f"Bearer {token}"}
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 512,
+            "temperature": 0.7
+        }
+    }
+    response = requests.post(API_URL, headers=headers, json=payload)
+    if response.status_code == 200:
+        return response.json()[0]['generated_text']
+    else:
+        return f"❌ Erreur : {response.status_code} - {response.json()}"
+
+if uploaded_file and hf_token:
     texte_pdf = lire_pdf(uploaded_file)
 
     with st.spinner("🔍 Analyse en cours..."):
         prompt = f"""
-Tu es un expert en appels à projets pour les associations sportives.
+Tu es un expert des appels à projets pour les associations sportives.
 
 Voici un appel à projet :
 -------------------------
@@ -49,17 +65,6 @@ Analyse l'appel à projet et :
 3. Propose un plan de réponse en 3 à 5 points.
         """
 
-        try:
-            client = OpenAI(api_key=openai_api_key)
-
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}]
-            )
-
-            resultat = response.choices[0].message.content
-            st.subheader("📌 Résultat de l'analyse")
-            st.markdown(resultat)
-
-        except Exception as e:
-            st.error(f"Erreur lors de l'appel à l'API OpenAI : {str(e)}")
+        resultat = interroger_modele_hf(prompt, hf_token)
+        st.subheader("📌 Résultat de l'analyse")
+        st.markdown(resultat)
