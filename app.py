@@ -110,4 +110,4 @@ def extraire_reponse(resultat):
     with st.spinner("✍️ Génération de la réponse..."):
         resultat = interroger_modele_hf(prompt, hf_token)
         st.subheader("📄 Proposition de projet générée")
-        st.markdown(reponse)
+        st.markdown(resultat)
