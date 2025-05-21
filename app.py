@@ -12,7 +12,7 @@ st.write("Déposez un appel à projet (PDF) et le profil de votre association (J
 # Interface utilisateur
 hf_token = st.text_input("🔑 Token Hugging Face", type="password")
 uploaded_file = st.file_uploader("📎 Appel à projet (PDF)", type="pdf")
-profil_file = st.file_uploader("📁 Profil de l'association (JSON)", type="json")
+
 
 # Lire un fichier PDF
 def lire_pdf(fichier):
@@ -21,6 +21,14 @@ def lire_pdf(fichier):
     for page in lecteur.pages:
         texte += page.extract_text()
     return texte
+    
+# Chargement du profil associatif
+try:
+    with open("profil_association.json", "r", encoding="utf-8") as f:
+        profil = json.load(f)
+except FileNotFoundError:
+    st.error("Fichier 'profil_association.json' manquant.")
+    st.stop()
 
 # Appeler le modèle Hugging Face
 def interroger_modele_hf(prompt, token):
