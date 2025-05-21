@@ -102,4 +102,4 @@ Rédige de façon professionnelle, claire et concise.
     with st.spinner("✍️ Génération de la réponse..."):
         resultat = interroger_modele_hf(prompt, hf_token)
         st.subheader("📄 Proposition de projet générée")
-        st.markdown(extraire_reponse(resultat))
+        st.markdown(resultat)
