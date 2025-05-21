@@ -67,8 +67,8 @@ if uploaded_file and hf_token:
     texte_pdf = lire_pdf(uploaded_file)
 
     with st.spinner("🔍 Analyse en cours..."):
-        prompt = f"""
-Tu es un expert des appels à projets pour les associations sportives.
+       prompt = f"""
+Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
 Voici un appel à projet :
 -------------------------
@@ -78,11 +78,21 @@ Voici le profil de l'association :
 -------------------------
 {json.dumps(profil, indent=2)}
 
-Analyse l'appel à projet et :
-1. Résume les objectifs, critères d’éligibilité, éléments demandés, dates importantes.
-2. Évalue si l'association semble éligible.
-3. Propose un plan de réponse en 3 à 5 points.
-        """
+Ta tâche : 
+Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
+
+Contenu attendu :
+- Titre du projet
+- Objectifs du projet
+- Public visé
+- Activités prévues
+- Partenaires éventuels
+- Budget estimé (si possible)
+- Résultats attendus
+
+Rédige de façon professionnelle, claire et concise.
+"""
+
 
         resultat = interroger_modele_hf(prompt, hf_token)
         st.subheader("📌 Résultat de l'analyse")
