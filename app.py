@@ -98,12 +98,6 @@ Contenu attendu :
 
 Rédige de façon professionnelle, claire et concise.
 """
-
-    with st.spinner("✍️ Génération de la réponse..."):
-        resultat = interroger_modele_hf(prompt, hf_token)
-        st.subheader("📄 Proposition de projet générée")
-
-
 def extraire_reponse(resultat):
     """
     Essaie d'extraire uniquement la partie entre les balises de réponse si présentes.
@@ -113,4 +107,7 @@ def extraire_reponse(resultat):
         return resultat.split("Titre du projet", 1)[-1].strip()
     return resultat.strip()
 
+    with st.spinner("✍️ Génération de la réponse..."):
+        resultat = interroger_modele_hf(prompt, hf_token)
+        st.subheader("📄 Proposition de projet générée")
         st.markdown(extraire_reponse)
