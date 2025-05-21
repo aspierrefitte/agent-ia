@@ -1,38 +1,30 @@
 import streamlit as st
-import fitz  # PyMuPDF
-import json
 import requests
-
-st.set_page_config(page_title="Agent IA - Appel à projet", layout="centered")
-
-st.title("📄 Agent IA - Analyse d'un appel à projet (version gratuite)")
-
-# Chargement du profil associatif
-try:
-    with open("profil_association.json", "r", encoding="utf-8") as f:
-        profil = json.load(f)
-except FileNotFoundError:
-    st.error("Fichier 'profil_association.json' manquant.")
-    st.stop()
-
-# Entrée du token Hugging Face
-hf_token = st.text_input("🔑 Token Hugging Face (ne sera pas stocké)", type="password")
-
-# Téléversement du PDF
-uploaded_file = st.file_uploader("📎 Téléverser un appel à projet (PDF)", type="pdf")
-
-def lire_pdf(file):
-    doc = fitz.open(stream=file.read(), filetype="pdf")
-    texte = ""
-    for page in doc:
-        texte += page.get_text()
-    return texte
-
+import PyPDF2
+import json
 import time
 
+st.set_page_config(page_title="Agent IA pour appel à projet", page_icon="📄")
+
+st.title("📄 Agent IA - Rédaction d'appel à projet")
+st.write("Déposez un appel à projet (PDF) et le profil de votre association (JSON). L'IA génère une proposition adaptée.")
+
+# Interface utilisateur
+hf_token = st.text_input("🔑 Token Hugging Face", type="password")
+uploaded_file = st.file_uploader("📎 Appel à projet (PDF)", type="pdf")
+profil_file = st.file_uploader("📁 Profil de l'association (JSON)", type="json")
+
+# Lire un fichier PDF
+def lire_pdf(fichier):
+    lecteur = PyPDF2.PdfReader(fichier)
+    texte = ""
+    for page in lecteur.pages:
+        texte += page.extract_text()
+    return texte
+
+# Appeler le modèle Hugging Face
 def interroger_modele_hf(prompt, token):
     API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
-
     headers = {"Authorization": f"Bearer {token}"}
     payload = {
         "inputs": prompt,
@@ -46,29 +38,40 @@ def interroger_modele_hf(prompt, token):
         response = requests.post(API_URL, headers=headers, json=payload)
 
         if response.status_code == 503:
-            # Modèle en train de se charger
             st.warning("⏳ Le modèle se réveille, réessai dans 10 secondes...")
             time.sleep(10)
             response = requests.post(API_URL, headers=headers, json=payload)
 
         if response.status_code == 200:
             resultat = response.json()
-            if isinstance(resultat, list) and "generated_text" in resultat[0]:
-                return resultat[0]["generated_text"]
+            if isinstance(resultat, list):
+                return resultat[0].get("generated_text", "⚠️ Réponse vide.")
             else:
-                return "⚠️ Réponse inattendue du modèle."
+                return f"Réponse inattendue : {resultat}"
         else:
             return f"❌ Erreur Hugging Face : code {response.status_code}"
 
     except Exception as e:
         return f"❌ Erreur système : {str(e)}"
 
+# Nettoyer la réponse IA pour n'afficher que le projet
+def extraire_reponse(text):
+    index = text.find("Titre du projet")
+    if index != -1:
+        return text[index:]
+    return text
 
-if uploaded_file and hf_token:
+# Traitement principal
+if uploaded_file and hf_token and profil_file:
+    try:
+        profil = json.load(profil_file)
+    except Exception as e:
+        st.error(f"❌ Erreur lors de la lecture du fichier JSON : {e}")
+        st.stop()
+
     texte_pdf = lire_pdf(uploaded_file)
 
-    with st.spinner("🔍 Analyse en cours..."):
-        prompt = f"""
+    prompt = f"""
 Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
 Voici un appel à projet :
@@ -92,17 +95,9 @@ Contenu attendu :
 - Résultats attendus
 
 Rédige de façon professionnelle, claire et concise.
-        """
+"""
 
-with st.spinner("🛠️ Génération de la réponse..."):
-    resultat = interroger_modele_hf(prompt, hf_token)
-    
-    def extraire_reponse(text):
-        index = text.find("Titre du projet")
-        if index != -1:
-            return text[index:]
-        return text
-
-    st.subheader("📄 Proposition de projet générée")
-    st.markdown(extraire_reponse(resultat))
-
+    with st.spinner("✍️ Génération de la réponse..."):
+        resultat = interroger_modele_hf(prompt, hf_token)
+        st.subheader("📄 Proposition de projet générée")
+        st.markdown(extraire_reponse(resultat))
