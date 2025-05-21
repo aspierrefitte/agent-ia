@@ -67,31 +67,37 @@ if uploaded_file and hf_token:
     texte_pdf = lire_pdf(uploaded_file)
 
     with st.spinner("🔍 Analyse en cours..."):
-       prompt = f"""
-    Tu es un assistant expert en rédaction d'appels à projets associatifs.
+       if uploaded_file and hf_token:
+    texte_pdf = lire_pdf(uploaded_file)
 
-    Voici un appel à projet :
-    -------------------------
-    {texte_pdf}
+    prompt = f"""
+Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
-    Voici le profil de l'association :
-    -------------------------
-    {json.dumps(profil, indent=2)}
+Voici un appel à projet :
+-------------------------
+{texte_pdf}
 
-    Ta tâche : 
-    Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
+Voici le profil de l'association :
+-------------------------
+{json.dumps(profil, indent=2)}
 
-    Contenu attendu :
-    - Titre du projet
-    - Objectifs du projet
-    - Public visé
-    - Activités prévues
-    - Partenaires éventuels
-    - Budget estimé (si possible)
-    - Résultats attendus
+Ta tâche : 
+Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
 
-    Rédige de façon professionnelle, claire et concise.
+Contenu attendu :
+- Titre du projet
+- Objectifs du projet
+- Public visé
+- Activités prévues
+- Partenaires éventuels
+- Budget estimé (si possible)
+- Résultats attendus
+
+Rédige de façon professionnelle, claire et concise.
 """
-resultat = interroger_modele_hf(prompt, hf_token)
-st.subheader("📌 Résultat de l'analyse")
-st.markdown(resultat)
+
+    with st.spinner("🛠️ Génération de la réponse..."):
+        resultat = interroger_modele_hf(prompt, hf_token)
+        st.subheader("📄 Proposition de projet générée")
+        st.markdown(resultat)
+
