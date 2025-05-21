@@ -98,14 +98,7 @@ Contenu attendu :
 
 Rédige de façon professionnelle, claire et concise.
 """
-def extraire_reponse(resultat):
-    """
-    Essaie d'extraire uniquement la partie entre les balises de réponse si présentes.
-    Sinon, retourne le texte brut.
-    """
-    if "Titre du projet" in resultat:
-        return resultat.split("Titre du projet", 1)[-1].strip()
-    return resultat.strip()
+
 
     with st.spinner("✍️ Génération de la réponse..."):
         resultat = interroger_modele_hf(prompt, hf_token)
