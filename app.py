@@ -68,30 +68,31 @@ if uploaded_file and hf_token:
 
     with st.spinner("🔍 Analyse en cours..."):
        prompt = f"""
-Tu es un assistant expert en rédaction d'appels à projets associatifs.
+    Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
-Voici un appel à projet :
--------------------------
-{texte_pdf}
+    Voici un appel à projet :
+    -------------------------
+    {texte_pdf}
 
-Voici le profil de l'association :
--------------------------
-{json.dumps(profil, indent=2)}
+    Voici le profil de l'association :
+    -------------------------
+    {json.dumps(profil, indent=2)}
 
-Ta tâche : 
-Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
+    Ta tâche : 
+    Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
 
-Contenu attendu :
-- Titre du projet
-- Objectifs du projet
-- Public visé
-- Activités prévues
-- Partenaires éventuels
-- Budget estimé (si possible)
-- Résultats attendus
+    Contenu attendu :
+    - Titre du projet
+    - Objectifs du projet
+    - Public visé
+    - Activités prévues
+    - Partenaires éventuels
+    - Budget estimé (si possible)
+    - Résultats attendus
 
-Rédige de façon professionnelle, claire et concise.
+    Rédige de façon professionnelle, claire et concise.
 """
+
 
 
         resultat = interroger_modele_hf(prompt, hf_token)
