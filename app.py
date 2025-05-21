@@ -94,7 +94,7 @@ Contenu attendu :
 Rédige de façon professionnelle, claire et concise.
         """
 
-    with st.spinner("🛠️ Génération de la réponse..."):
+with st.spinner("🛠️ Génération de la réponse..."):
     resultat = interroger_modele_hf(prompt, hf_token)
     
     def extraire_reponse(text):
