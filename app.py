@@ -80,7 +80,7 @@ Voici le profil de l'association :
 {json.dumps(profil, indent=2)}
 
 Analyse l'appel à projet et :
-1. Résume les objectifs, critères d’éligibilité, éléments demandés, dates importantes.
+1. Résume uniquement les objectifs, critères d’éligibilité, éléments demandés, dates importantes.
 2. Évalue si l'association semble éligible.
 3. Propose un plan de réponse en 3 à 5 points.
         """
