@@ -30,6 +30,13 @@ except FileNotFoundError:
     st.error("Fichier 'profil_association.json' manquant.")
     st.stop()
 
+#briefing de l'ia
+idee_projet = st.text_area(
+    "💬 Débrief / idée de projet souhaitée",
+    placeholder="Par exemple : un programme pour initier les jeunes filles au football dans les quartiers ruraux..."
+)
+
+
 # Appeler le modèle Hugging Face
 def interroger_modele_hf(prompt, token):
     API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
@@ -73,6 +80,10 @@ def extraire_reponse(text):
 if uploaded_file and hf_token :
     texte_pdf = lire_pdf(uploaded_file)
 
+
+
+
+
     prompt = f"""
 Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
@@ -83,6 +94,11 @@ Voici un appel à projet :
 Voici le profil de l'association :
 -------------------------
 {json.dumps(profil, indent=2)}
+
+
+Voici l'idée de projet de l'association (optionnelle mais à suivre si possible) :
+-------------------------
+{idee_projet}
 
 Ta tâche : 
 Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
