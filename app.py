@@ -28,6 +28,8 @@ def lire_pdf(file):
         texte += page.get_text()
     return texte
 
+import time
+
 def interroger_modele_hf(prompt, token):
     API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
     headers = {"Authorization": f"Bearer {token}"}
@@ -38,11 +40,28 @@ def interroger_modele_hf(prompt, token):
             "temperature": 0.7
         }
     }
-    response = requests.post(API_URL, headers=headers, json=payload)
-    if response.status_code == 200:
-        return response.json()[0]['generated_text']
-    else:
-        return f"❌ Erreur : {response.status_code} - {response.json()}"
+
+    try:
+        response = requests.post(API_URL, headers=headers, json=payload)
+
+        if response.status_code == 503:
+            # Modèle en train de se charger
+            st.warning("⏳ Le modèle se réveille, réessai dans 10 secondes...")
+            time.sleep(10)
+            response = requests.post(API_URL, headers=headers, json=payload)
+
+        if response.status_code == 200:
+            resultat = response.json()
+            if isinstance(resultat, list) and "generated_text" in resultat[0]:
+                return resultat[0]["generated_text"]
+            else:
+                return "⚠️ Réponse inattendue du modèle."
+        else:
+            return f"❌ Erreur Hugging Face : code {response.status_code}"
+
+    except Exception as e:
+        return f"❌ Erreur système : {str(e)}"
+
 
 if uploaded_file and hf_token:
     texte_pdf = lire_pdf(uploaded_file)
