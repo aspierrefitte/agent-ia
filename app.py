@@ -63,9 +63,6 @@ def interroger_modele_hf(prompt, token):
         return f"❌ Erreur système : {str(e)}"
 
 
-if uploaded_file and hf_token:
-    texte_pdf = lire_pdf(uploaded_file)
-
     with st.spinner("🔍 Analyse en cours..."):
        if uploaded_file and hf_token:
     texte_pdf = lire_pdf(uploaded_file)
