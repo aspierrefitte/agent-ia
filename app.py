@@ -31,7 +31,8 @@ def lire_pdf(file):
 import time
 
 def interroger_modele_hf(prompt, token):
-    API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+    API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
+
     headers = {"Authorization": f"Bearer {token}"}
     payload = {
         "inputs": prompt,
