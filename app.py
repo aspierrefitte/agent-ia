@@ -94,6 +94,15 @@ Contenu attendu :
 Rédige de façon professionnelle, claire et concise.
         """
 
-        resultat = interroger_modele_hf(prompt, hf_token)
-        st.subheader("📌 Résultat de l'analyse")
-        st.markdown(resultat)
+    with st.spinner("🛠️ Génération de la réponse..."):
+    resultat = interroger_modele_hf(prompt, hf_token)
+    
+    def extraire_reponse(text):
+        index = text.find("Titre du projet")
+        if index != -1:
+            return text[index:]
+        return text
+
+    st.subheader("📄 Proposition de projet générée")
+    st.markdown(extraire_reponse(resultat))
+
