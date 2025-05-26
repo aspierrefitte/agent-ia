@@ -105,6 +105,6 @@ Rédige de façon professionnelle, claire et concise.
 
 
     with st.spinner("✍️ Génération de la réponse..."):
-        resultat = interroger_modele_hf(prompt, openai_api_key)
+        resultat = interroger_modele_openai(prompt, openai_api_key)
         st.subheader("📄 Proposition de projet générée")
         st.markdown(resultat)
