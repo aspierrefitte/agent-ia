@@ -46,35 +46,39 @@ if st.button("🚀 Générer la réponse") and uploaded_file and hf_token and gi
 
         texte_pdf = lire_pdf(uploaded_file)
 
-prompt = f"""
-Tu es un assistant expert en rédaction d'appels à projets associatifs.
+try:
+    prompt = f"""
+    Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
-Voici un appel à projet :
--------------------------
-{texte_pdf}
+    Voici un appel à projet :
+    -------------------------
+    {texte_pdf}
 
-Voici le profil de l'association :
--------------------------
-{json.dumps(profil, indent=2)}
+    Voici le profil de l'association :
+    -------------------------
+    {json.dumps(profil, indent=2)}
 
-{"Voici une idée à intégrer : " + idee if idee else ""}
+    {"Voici une idée à intégrer : " + idee if idee else ""}
 
-Ta tâche : 
-Rédige une **proposition unique et complète** pour répondre à cet appel à projet au nom de l'association.
+    Ta tâche : 
+    Rédige une **proposition unique et complète** pour répondre à cet appel à projet au nom de l'association.
 
-La proposition doit contenir, clairement structurés :
-- Titre du projet
-- Objectifs du projet
-- Public visé
-- Activités prévues
-- Partenaires éventuels
-- Budget estimé (si possible)
-- Résultats attendus
+    La proposition doit contenir, clairement structurés :
+    - Titre du projet
+    - Objectifs du projet
+    - Public visé
+    - Activités prévues
+    - Partenaires éventuels
+    - Budget estimé (si possible)
+    - Résultats attendus
 
-Ne donne aucune autre information, analyse, résumé, ou conseil.
+    Ne donne aucune autre information, analyse, résumé, ou conseil.
 
-Rédige de façon professionnelle, claire, concise, et directement utilisable dans une réponse à l'appel à projet.
-"""
+    Rédige de façon professionnelle, claire, concise, et directement utilisable dans une réponse à l'appel à projet.
+    """
+except Exception as e:
+    st.error(f"Erreur lors de la création du prompt : {e}")
+
         with st.spinner("✍️ Génération de la réponse..."):
             resultat = interroger_modele_hf(prompt, hf_token)
 
