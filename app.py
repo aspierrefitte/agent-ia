@@ -39,11 +39,13 @@ idee_projet = st.text_area(
 
 
 # Appeler le modèle 
+from openai import OpenAI
+
 def interroger_modele_openai(prompt, openai_api_key):
-    openai.api_key = openai_api_key
+    client = OpenAI(api_key=openai_api_key)
 
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",  # ou "gpt-4" si tu y as accès
             messages=[
                 {"role": "system", "content": "Tu es un assistant expert en appels à projets associatifs."},
@@ -52,10 +54,11 @@ def interroger_modele_openai(prompt, openai_api_key):
             temperature=0.7,
             max_tokens=1500,
         )
-        return response["choices"][0]["message"]["content"]
+        return response.choices[0].message.content
 
     except Exception as e:
         return f"❌ Erreur OpenAI : {str(e)}"
+
 
 # Nettoyer la réponse IA pour n'afficher que le projet
 def extraire_reponse(text):
