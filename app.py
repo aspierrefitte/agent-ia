@@ -60,19 +60,20 @@ Voici le profil de l'association :
 {"Voici une idée à intégrer : " + idee if idee else ""}
 
 Ta tâche : 
-Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
+Propose une **unique réponse structurée et complète** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
 
-Contenu attendu :
+Contenu attendu (une seule proposition unique) :
 - Titre du projet
 - Objectifs du projet
 - Public visé
 - Activités prévues
 - Partenaires éventuels
-- Budget estimé (si possible)
+- Budget estimé dans les grandes lignes
 - Résultats attendus
 
 Rédige de façon professionnelle, claire et concise.
 """
+
 
         with st.spinner("✍️ Génération de la réponse..."):
             resultat = interroger_modele_hf(prompt, hf_token)
