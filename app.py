@@ -1,81 +1,54 @@
 import streamlit as st
 import requests
-import PyPDF2
 import json
-import time
-import openai
+import PyPDF2
 
-st.set_page_config(page_title="Agent IA pour appel à projet", page_icon="📄")
+# 🔧 URL du modèle Hugging Face (modifiable si tu veux tester un autre modèle)
+API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 
-st.title("📄 Agent IA - Rédaction d'appel à projet")
-st.write("Déposez un appel à projet (PDF) et le profil de votre association (JSON). L'IA génère une proposition adaptée.")
-
-# Interface utilisateur
-openai_api_key = st.text_input("🔑 Clé API OpenAI", type="password")
-uploaded_file = st.file_uploader("📎 Appel à projet (PDF)", type="pdf")
-
-
-# Lire un fichier PDF
-def lire_pdf(fichier):
-    lecteur = PyPDF2.PdfReader(fichier)
+# 📥 Lire le PDF
+def lire_pdf(fichier_pdf):
+    reader = PyPDF2.PdfReader(fichier_pdf)
     texte = ""
-    for page in lecteur.pages:
+    for page in reader.pages:
         texte += page.extract_text()
     return texte
-    
-# Chargement du profil associatif
-try:
-    with open("profil_association.json", "r", encoding="utf-8") as f:
-        profil = json.load(f)
-except FileNotFoundError:
-    st.error("Fichier 'profil_association.json' manquant.")
-    st.stop()
 
-#briefing de l'ia
-idee_projet = st.text_area(
-    "💬 Débrief / idée de projet souhaitée",
-    placeholder="Par exemple : un programme pour initier les jeunes filles au football dans les quartiers ruraux..."
-)
+# 💬 Fonction pour interroger le modèle Hugging Face
+def interroger_modele_hf(prompt, token):
+    headers = {"Authorization": f"Bearer {token}"}
+    payload = {
+        "inputs": prompt,
+        "parameters": {"temperature": 0.7, "max_new_tokens": 800},
+    }
+    response = requests.post(API_URL, headers=headers, json=payload)
 
+    if response.status_code == 200:
+        output = response.json()
+        if isinstance(output, list) and "generated_text" in output[0]:
+            return output[0]["generated_text"]
+        else:
+            return "❌ Format de réponse inattendu."
+    else:
+        return f"❌ Erreur Hugging Face : code {response.status_code}"
 
-# Appeler le modèle 
-from openai import OpenAI
+# 🌐 Interface Streamlit
+st.set_page_config(page_title="🧠 Agent IA pour Appels à Projets", layout="centered")
+st.title("🏓 Agent IA pour Répondre à un Appel à Projet")
 
-def interroger_modele_openai(prompt, openai_api_key):
-    client = OpenAI(api_key=openai_api_key)
+hf_token = st.text_input("🔑 Clé Hugging Face", type="password")
 
+uploaded_file = st.file_uploader("📄 Charger un appel à projet (PDF)", type=["pdf"])
+profil_json = st.text_area("🧾 Profil de l'association (JSON)", height=200)
+
+idee = st.text_area("💡 Optionnel : une idée de projet à proposer ? (facultatif)", height=150)
+
+if st.button("🚀 Générer la réponse") and uploaded_file and profil_json and hf_token:
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # ou "gpt-4" si tu y as accès
-            messages=[
-                {"role": "system", "content": "Tu es un assistant expert en appels à projets associatifs."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=1500,
-        )
-        return response.choices[0].message.content
+        texte_pdf = lire_pdf(uploaded_file)
+        profil = json.loads(profil_json)
 
-    except Exception as e:
-        return f"❌ Erreur OpenAI : {str(e)}"
-
-
-# Nettoyer la réponse IA pour n'afficher que le projet
-def extraire_reponse(text):
-    index = text.find("Titre du projet")
-    if index != -1:
-        return text[index:]
-    return text
-
-# Traitement principal
-if uploaded_file and openai_api_key :
-    texte_pdf = lire_pdf(uploaded_file)
-
-
-
-
-
-    prompt = f"""
+        prompt = f"""
 Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
 Voici un appel à projet :
@@ -86,10 +59,7 @@ Voici le profil de l'association :
 -------------------------
 {json.dumps(profil, indent=2)}
 
-
-Voici l'idée de projet de l'association (optionnelle mais à suivre si possible) :
--------------------------
-{idee_projet}
+{"Voici une idée à intégrer : " + idee if idee else ""}
 
 Ta tâche : 
 Propose une **réponse structurée** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
@@ -106,8 +76,11 @@ Contenu attendu :
 Rédige de façon professionnelle, claire et concise.
 """
 
+        with st.spinner("✍️ Génération de la réponse..."):
+            resultat = interroger_modele_hf(prompt, hf_token)
 
-    with st.spinner("✍️ Génération de la réponse..."):
-        resultat = interroger_modele_openai(prompt, openai_api_key)
         st.subheader("📄 Proposition de projet générée")
         st.markdown(resultat)
+
+    except Exception as e:
+        st.error(f"Erreur : {str(e)}")
