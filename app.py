@@ -46,7 +46,7 @@ if st.button("🚀 Générer la réponse") and uploaded_file and hf_token and gi
 
         texte_pdf = lire_pdf(uploaded_file)
 
-try:
+        try:
     prompt = f"""
     Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
