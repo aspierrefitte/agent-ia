@@ -46,7 +46,7 @@ if st.button("🚀 Générer la réponse") and uploaded_file and hf_token and gi
 
         texte_pdf = lire_pdf(uploaded_file)
 
-        prompt = f"""
+prompt = f"""
 Tu es un assistant expert en rédaction d'appels à projets associatifs.
 
 Voici un appel à projet :
@@ -60,19 +60,22 @@ Voici le profil de l'association :
 {"Voici une idée à intégrer : " + idee if idee else ""}
 
 Ta tâche : 
-Propose une **unique réponse structurée et complète** à cet appel à projet au nom de l'association. Ne fais **aucune analyse**, ne donne pas d'avis, ne fais pas de résumé.
+Rédige une **proposition unique et complète** pour répondre à cet appel à projet au nom de l'association.
 
-Contenu attendu (une seule proposition unique) :
+La proposition doit contenir, clairement structurés :
 - Titre du projet
 - Objectifs du projet
 - Public visé
 - Activités prévues
 - Partenaires éventuels
-- Budget estimé dans les grandes lignes
+- Budget estimé (si possible)
 - Résultats attendus
 
-Rédige de façon professionnelle, claire et concise.
+Ne donne aucune autre information, analyse, résumé, ou conseil.
+
+Rédige de façon professionnelle, claire, concise, et directement utilisable dans une réponse à l'appel à projet.
 """
+
 
 
         with st.spinner("✍️ Génération de la réponse..."):
