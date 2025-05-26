@@ -3,6 +3,7 @@ import requests
 import PyPDF2
 import json
 import time
+import openai
 
 st.set_page_config(page_title="Agent IA pour appel à projet", page_icon="📄")
 
@@ -10,7 +11,7 @@ st.title("📄 Agent IA - Rédaction d'appel à projet")
 st.write("Déposez un appel à projet (PDF) et le profil de votre association (JSON). L'IA génère une proposition adaptée.")
 
 # Interface utilisateur
-hf_token = st.text_input("🔑 Token Hugging Face", type="password")
+openai_api_key = st.text_input("🔑 Clé API OpenAI", type="password")
 uploaded_file = st.file_uploader("📎 Appel à projet (PDF)", type="pdf")
 
 
@@ -37,37 +38,24 @@ idee_projet = st.text_area(
 )
 
 
-# Appeler le modèle Hugging Face
-def interroger_modele_hf(prompt, token):
-    API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
-    headers = {"Authorization": f"Bearer {token}"}
-    payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_new_tokens": 512,
-            "temperature": 0.7
-        }
-    }
+# Appeler le modèle 
+def interroger_modele_openai(prompt, openai_api_key):
+    openai.api_key = openai_api_key
 
     try:
-        response = requests.post(API_URL, headers=headers, json=payload)
-
-        if response.status_code == 503:
-            st.warning("⏳ Le modèle se réveille, réessai dans 10 secondes...")
-            time.sleep(10)
-            response = requests.post(API_URL, headers=headers, json=payload)
-
-        if response.status_code == 200:
-            resultat = response.json()
-            if isinstance(resultat, list):
-                return resultat[0].get("generated_text", "⚠️ Réponse vide.")
-            else:
-                return f"Réponse inattendue : {resultat}"
-        else:
-            return f"❌ Erreur Hugging Face : code {response.status_code}"
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # ou "gpt-4" si tu y as accès
+            messages=[
+                {"role": "system", "content": "Tu es un assistant expert en appels à projets associatifs."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1500,
+        )
+        return response["choices"][0]["message"]["content"]
 
     except Exception as e:
-        return f"❌ Erreur système : {str(e)}"
+        return f"❌ Erreur OpenAI : {str(e)}"
 
 # Nettoyer la réponse IA pour n'afficher que le projet
 def extraire_reponse(text):
@@ -77,7 +65,7 @@ def extraire_reponse(text):
     return text
 
 # Traitement principal
-if uploaded_file and hf_token :
+if uploaded_file and openai_api_key :
     texte_pdf = lire_pdf(uploaded_file)
 
 
@@ -117,6 +105,6 @@ Rédige de façon professionnelle, claire et concise.
 
 
     with st.spinner("✍️ Génération de la réponse..."):
-        resultat = interroger_modele_hf(prompt, hf_token)
+        resultat = interroger_modele_hf(prompt, openai_api_key)
         st.subheader("📄 Proposition de projet générée")
         st.markdown(resultat)
