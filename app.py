@@ -75,9 +75,6 @@ Ne donne aucune autre information, analyse, résumé, ou conseil.
 
 Rédige de façon professionnelle, claire, concise, et directement utilisable dans une réponse à l'appel à projet.
 """
-
-
-
         with st.spinner("✍️ Génération de la réponse..."):
             resultat = interroger_modele_hf(prompt, hf_token)
 
