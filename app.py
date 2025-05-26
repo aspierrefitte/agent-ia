@@ -32,6 +32,17 @@ def interroger_modele_hf(prompt, token):
     else:
         return f"❌ Erreur Hugging Face : code {response.status_code}"
 
+def charger_profil_depuis_url(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        st.error(f"❌ Impossible de charger le profil depuis l'URL : https://raw.githubusercontent.com/aspierrefitte/agent-ia/main/profil_association.json
+")
+        return None
+
+
 # 🌐 Interface Streamlit
 st.set_page_config(page_title="🧠 Agent IA pour Appels à Projets", layout="centered")
 st.title("🏓 Agent IA pour Répondre à un Appel à Projet")
@@ -39,7 +50,7 @@ st.title("🏓 Agent IA pour Répondre à un Appel à Projet")
 hf_token = st.text_input("🔑 Clé Hugging Face", type="password")
 
 uploaded_file = st.file_uploader("📄 Charger un appel à projet (PDF)", type=["pdf"])
-profil_json = st.text_area("🧾 Profil de l'association (JSON)", height=200)
+profil_json = charger_profil_depuis_url
 
 idee = st.text_area("💡 Optionnel : une idée de projet à proposer ? (facultatif)", height=150)
 
