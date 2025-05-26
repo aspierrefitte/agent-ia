@@ -3,10 +3,8 @@ import requests
 import json
 import PyPDF2
 
-# 🔧 URL du modèle Hugging Face (modifiable si tu veux tester un autre modèle)
 API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 
-# 📥 Lire le PDF
 def lire_pdf(fichier_pdf):
     reader = PyPDF2.PdfReader(fichier_pdf)
     texte = ""
@@ -14,7 +12,6 @@ def lire_pdf(fichier_pdf):
         texte += page.extract_text()
     return texte
 
-# 💬 Fonction pour interroger le modèle Hugging Face
 def interroger_modele_hf(prompt, token):
     headers = {"Authorization": f"Bearer {token}"}
     payload = {
@@ -32,32 +29,22 @@ def interroger_modele_hf(prompt, token):
     else:
         return f"❌ Erreur Hugging Face : code {response.status_code}"
 
-def charger_profil_depuis_url(url):
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.json()
-    except Exception as e:
-        st.error(f"❌ Impossible de charger le profil depuis l'URL : https://raw.githubusercontent.com/aspierrefitte/agent-ia/main/profil_association.json
-")
-        return None
-
-
-# 🌐 Interface Streamlit
 st.set_page_config(page_title="🧠 Agent IA pour Appels à Projets", layout="centered")
 st.title("🏓 Agent IA pour Répondre à un Appel à Projet")
 
 hf_token = st.text_input("🔑 Clé Hugging Face", type="password")
-
+github_url = st.text_input("🌐 URL brute GitHub du profil JSON", value="https://raw.githubusercontent.com/aspierrefitte/agent-ia/main/profil_association.json")
 uploaded_file = st.file_uploader("📄 Charger un appel à projet (PDF)", type=["pdf"])
-profil_json = charger_profil_depuis_url
-
 idee = st.text_area("💡 Optionnel : une idée de projet à proposer ? (facultatif)", height=150)
 
-if st.button("🚀 Générer la réponse") and uploaded_file and profil_json and hf_token:
+if st.button("🚀 Générer la réponse") and uploaded_file and hf_token and github_url:
     try:
+        # Télécharger le profil JSON depuis GitHub
+        r = requests.get(github_url)
+        r.raise_for_status()
+        profil = r.json()
+
         texte_pdf = lire_pdf(uploaded_file)
-        profil = json.loads(profil_json)
 
         prompt = f"""
 Tu es un assistant expert en rédaction d'appels à projets associatifs.
